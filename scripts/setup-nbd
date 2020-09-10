@@ -45,22 +45,34 @@ if [ -z "${nbd}" ] || ! echo $nbd | grep -q "/dev"; then
     exit 1
 fi
 
-echo "Binding image to $nbd..."
-qemu-nbd -d $nbd
-if [ -n "$IMG_FMT" ]; then
-    qemu-nbd -c $nbd -f "$IMG_FMT" -n output-qemu/packer-qemu
-else
-    qemu-nbd -c $nbd -n output-qemu/packer-qemu
-fi
-echo 'Waiting for partitions to be created...'
 tries=0
-while [ ! -e "${nbd}p1" -a $tries -lt 60 ]; do
-    sleep 1
-    tries=$((tries+1))
+while [ $tries -lt 5 ]; do
+     echo "Binding image to $nbd..."
+     sync output-qemu/packer-qemu
+     qemu-nbd -d $nbd
+     if [ -n "$IMG_FMT" ]; then
+	 qemu-nbd -c $nbd -f "$IMG_FMT" -n output-qemu/packer-qemu
+     else
+	 qemu-nbd -c $nbd -n output-qemu/packer-qemu
+     fi
+     echo 'Waiting for partitions to be created...'
+     inner_tries=0
+     while [ ! -e "${nbd}p1" -a $inner_tries -lt 60 ]; do
+	 sleep 1
+	 inner_tries=$((inner_tries+1))
+     done
+
+     echo "------------------- dmesg ---------------------"
+     dmesg
+     echo
+     echo
+     ls /dev/nbd*
+
+     if [ -e "${nbd}p1" ]; then
+	 break
+     else
+	 echo "Retrying..."
+	 tries=$((tries+1))
+     fi
 done
 
-echo "------------------- dmesg ---------------------"
-dmesg
-echo
-echo
-ls /dev/nbd*
