@@ -13,6 +13,7 @@
             "boot_command": [
                 "<tab> ",
                 "inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos7.ks ",
+                "console=ttyS0 inst.cmdline",
                 "<enter>"
             ],
             "boot_wait": "3s",
@@ -21,6 +22,9 @@
             "memory": 2048,
             "http_directory": "http",
             "shutdown_timeout": "20m"
+            "qemuargs": [
+                [ "-serial", "stdio" ]
+            ]
         }
     ],
     "post-processors": [
