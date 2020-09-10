@@ -58,3 +58,9 @@ while [ ! -e "${nbd}p1" -a $tries -lt 60 ]; do
     sleep 1
     tries=$((tries+1))
 done
+
+echo "------------------- dmesg ---------------------"
+dmesg
+echo
+echo
+ls /dev/nbd*
