@@ -13,7 +13,7 @@
             "boot_command": [
                 "<up><tab> ",
                 "inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos8.ks ",
-                "console=ttyS0 inst.cmdline",
+                "console=ttyS0 inst.cmdline inst.loglevel=debug",
                 "<enter>"
             ],
             "boot_wait": "3s",
